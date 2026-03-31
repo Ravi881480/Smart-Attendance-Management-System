@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Profile</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="app-layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          <h3>Admin Menu</h3>
+        </div>
+        <nav class="sidebar-menu">
+          <a href="/admin-dashboard">📊 Dashboard</a>
+          <a href="/admin/profile" class="active">👤 Admin Profile</a>
+          <a href="/logout" class="logout">🚪 Logout</a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main-content">
+        <div class="dashboard-container">
+          <h2>Admin Profile</h2>
+
+          <div class="profile-card">
+            <!-- Avatar -->
+            <div class="profile-avatar">👤</div>
+
+            <!-- Info -->
+            <div class="profile-info">
+              <h3>{{ admin_name }}</h3>
+              <p class="username">@{{ admin_username }}</p>
+              <span class="role-badge">System Administrator</span>
+            </div>
+
+            <hr />
+
+            <!-- Security Section -->
+            <div class="profile-section">
+              <h4>🔐 Change Password</h4>
+
+              {% if message %}
+              <p class="profile-message">{{ message }}</p>
+              {% endif %}
+
+              <form method="post" class="profile-form">
+                <input
+                  type="password"
+                  name="current_password"
+                  placeholder="Current Password"
+                  required
+                />
+
+                <input
+                  type="password"
+                  name="new_password"
+                  placeholder="New Password"
+                  required
+                />
+
+                <button type="submit" class="action-btn action-info">
+                  Update Password
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Student Attendance</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      .attendance-container {
+        padding: 30px;
+      }
+
+      .chart-box {
+        height: 300px;
+        margin-bottom: 40px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+
+      th {
+        background: #f3f4f6;
+      }
+
+      .view-btn {
+        background: #ef4444;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .overall {
+        font-size: 20px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="attendance-container">
+      <div class="header">
+        <h2>Attendance Overview</h2>
+        <div class="overall">Overall: {{ overall_percentage }}%</div>
+      </div>
+
+      <!-- CHART -->
+      <div class="chart-box">
+        <canvas id="attendanceChart"></canvas>
+      </div>
+
+      <!-- TABLE -->
+      <table>
+        <tr>
+          <th>Subject</th>
+          <th>Total Delivered</th>
+          <th>Total Attended</th>
+          <th>Percentage</th>
+          <th>View</th>
+        </tr>
+
+        {% for row in attendance %}
+        <tr>
+          <td>{{ row.subject }}</td>
+          <td>{{ row.total }}</td>
+          <td>{{ row.attended }}</td>
+          <td>{{ row.percentage }}%</td>
+          <td>
+            <a href="#" class="view-btn">VIEW</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <script>
+      const data = {{ attendance | tojson | safe }};
+
+      new Chart(document.getElementById('attendanceChart'), {
+          type: 'bar',
+          data: {
+              labels: data.map(r => r.subject),
+              datasets: [{
+                  label: 'Total Percentage',
+                  data: data.map(r => r.percentage),
+                  backgroundColor: '#22c55e'
+              }]
+          },
+          options: {
+              responsive: true,
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      max: 100
+                  }
+              }
+          }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Class Attendance Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="dashboard-header">
+    <h2>Class Attendance Report</h2>
+    <a href="/teacher-dashboard">
+        <button class="logout-btn">Back</button>
+    </a>
+</div>
+
+<div class="dashboard-container">
+<div class="attendance-table">
+<table>
+    <tr>
+        <th>Class</th>
+        <th>Total Records</th>
+        <th>Present</th>
+        <th>Attendance %</th>
+    </tr>
+
+    {% for row in data %}
+    <tr>
+        <td>{{ row.class }}</td>
+        <td>{{ row.total_students }}</td>
+        <td>{{ row.present_count }}</td>
+        <td>
+            {{ (row.present_count * 100 / row.total_students) | round(2) }}%
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+</div>
+</div>
+
+</body>
+</html>

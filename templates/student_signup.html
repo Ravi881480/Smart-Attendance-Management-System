@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Student Sign Up</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <!-- SAME BACKGROUND AS TEACHER -->
+    <div class="login-page">
+      <!-- CENTER ALIGN -->
+      <div class="login-container">
+        <!-- GLASS CARD -->
+        <div class="login-card">
+          <h2>Student Sign Up</h2>
+          <p class="subtitle">Create your student account</p>
+
+          {% if error %}
+          <p style="color: #ff6b6b; margin-bottom: 10px">{{ error }}</p>
+          {% endif %}
+
+          <form method="POST">
+            <input type="text" name="uid" placeholder="Student UID" required />
+            <input type="text" name="name" placeholder="Full Name" required />
+            <input type="email" name="email" placeholder="Email" required />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+
+            <button type="submit" class="login-btn">Create Account</button>
+          </form>
+
+          <p class="footer-text">
+            Already have an account?
+            <a href="{{ url_for('student_login') }}" class="auth-link">
+              Login
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>All Teachers Timetable</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="app-layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          <h3>Admin Menu</h3>
+        </div>
+
+        <nav class="sidebar-menu">
+          <a href="/admin-dashboard">📊 Dashboard</a>
+          <a href="/admin/teachers">👩‍🏫 Teachers</a>
+          <a href="/admin/teacher-timetable" class="active">
+            Teacher Timetable
+          </a>
+          <a href="/logout" class="logout">🚪 Logout</a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main-content">
+        <div class="dashboard-container">
+          <h2>All Teachers Timetable</h2>
+
+          <div class="table-card">
+            <table class="pro-table">
+              <thead>
+                <tr>
+                  <th>Teacher</th>
+                  <th>Day</th>
+                  <th>Subject</th>
+                  <th>Class</th>
+                  <th>Time</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {% for t in timetable %}
+                <tr>
+                  <td>{{ t.name }}</td>
+                  <td>{{ t.day }}</td>
+                  <td>{{ t.subject }}</td>
+                  <td>{{ t.class }}</td>
+                  <td>{{ t.start_time }} – {{ t.end_time }}</td>
+                  <td>
+                    <a href="/admin/edit-timetable/{{ t.id }}" class="edit-btn">
+                      ✏️ Edit
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

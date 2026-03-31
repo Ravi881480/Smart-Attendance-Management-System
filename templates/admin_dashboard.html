@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Dashboard</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="app-layout">
+      <!-- ===== ADMIN SIDEBAR ===== -->
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          <h3>Admin Menu</h3>
+        </div>
+
+        <nav class="sidebar-menu">
+          <a href="/admin-dashboard" class="active">📊 Dashboard</a>
+          <a href="/admin/profile">👤 Admin Profile</a>
+          <a href="/admin/logs">📜 Admin Logs</a>
+          <a href="/admin/students">👨‍🎓 Students</a>
+          <a href="/admin/add-student">➕ Add Student</a>
+          <a href="/admin/teachers">👩‍🏫 View Teachers</a>
+          <a href="/admin/add-teacher">👩‍🏫 Add Teacher</a>
+          <a href="/admin/teacher-timetable">📅 Teacher Timetable</a>
+          <a href="/admin/add-teacher-timetable">➕ Add Teacher Timetable</a>
+          <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
+        </nav>
+      </aside>
+
+      <!-- ===== MAIN CONTENT ===== -->
+      <main class="main-content">
+        <div class="dashboard-container">
+          <!-- ===== HEADER ===== -->
+          <div class="dashboard-header">
+            <h2>Admin Dashboard</h2>
+            <div class="header-right">
+              <span>System Administrator</span>
+              <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+            </div>
+          </div>
+
+          <!-- ===== DASHBOARD CARDS ===== -->
+          <div class="dashboard-cards">
+            <div class="card">
+              <h3>Total Students</h3>
+              <p>{{ total_students }}</p>
+            </div>
+
+            <div class="card">
+              <h3>Total Teachers</h3>
+              <p>{{ total_teachers }}</p>
+            </div>
+
+            <div class="card">
+              <h3>Attendance Records</h3>
+              <p>{{ total_records }}</p>
+            </div>
+          </div>
+
+          <!-- ===== ADMIN ACTIONS ===== -->
+          <h3>Admin Actions</h3>
+
+          <div class="admin-actions">
+            <a href="/admin/students" class="action-btn action-primary">
+              View Students
+            </a>
+
+            <a href="/admin/add-student" class="action-btn action-success">
+              Add Student
+            </a>
+
+            <a href="/admin/add-teacher" class="action-btn action-info">
+              Add Teacher
+            </a>
+
+            <a href="/admin/teachers" class="action-btn action-purple">
+              View Teachers
+            </a>
+
+            <!-- NEW BUTTONS -->
+            <a
+              href="/admin/teacher-timetable"
+              class="action-btn action-warning"
+            >
+              Teacher Timetable
+            </a>
+
+            <a
+              href="/admin/add-teacher-timetable"
+              class="action-btn action-dark"
+            >
+              Add Timetable
+            </a>
+          </div>
+
+          <!-- ===== INFO TABLE ===== -->
+          <div class="attendance-table" style="margin-top: 30px">
+            <h3 style="margin-bottom: 15px">Admin Capabilities</h3>
+
+            <table>
+              <tr>
+                <th>Module</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td>Students</td>
+                <td>Manage student accounts (Add / Edit / Delete)</td>
+              </tr>
+              <tr>
+                <td>Teachers</td>
+                <td>Monitor teacher activity and dashboards</td>
+              </tr>
+              <tr>
+                <td>Attendance</td>
+                <td>View and audit attendance logs</td>
+              </tr>
+              <tr>
+                <td>Reports</td>
+                <td>Download student attendance reports</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

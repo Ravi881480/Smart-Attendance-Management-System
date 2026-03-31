@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Teacher Dashboard</title>
+
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+
+  <body>
+    <div class="app-layout">
+      <!-- ================= SIDEBAR ================= -->
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          <h3>Teacher Menu</h3>
+        </div>
+
+        <nav class="sidebar-menu">
+          <a href="/teacher-dashboard" class="active">
+            📊 <span>Dashboard</span>
+          </a>
+          <a href="/teacher/timetable"> 📅 <span>Timetable</span> </a>
+
+          <a href="/teacher/students"> 👨‍🎓 <span>Students</span> </a>
+
+          <a href="/teacher/history"> 📅 <span>Attendance History</span> </a>
+
+          <a href="/teacher/class-report"> 🏫 <span>Class Report</span> </a>
+
+          <a href="/teacher/subject-report"> 📚 <span>Subject Report</span> </a>
+
+          <a href="/teacher/students-performance">
+            📈 <span>Performance</span>
+          </a>
+
+          <!-- LOGOUT AT BOTTOM -->
+          <a href="/" class="logout"> 🚪 <span>Logout</span> </a>
+        </nav>
+      </aside>
+
+      <!-- ================= MAIN CONTENT ================= -->
+      <main class="main-content">
+        <!-- ================= HEADER ================= -->
+        <div class="dashboard-header">
+          <div class="header-left">
+            <button class="sidebar-toggle">☰</button>
+            <h2>Teacher Dashboard</h2>
+          </div>
+
+          <div class="header-right">
+            <div class="profile-menu">
+              <div class="profile-trigger">
+                <img
+                  src="{{ url_for('static', filename='images/profile.png') }}"
+                  class="profile-avatar"
+                />
+                <span class="profile-name">{{ session['teacher_name'] }}</span>
+                <span class="profile-arrow">▼</span>
+              </div>
+
+              <div class="profile-dropdown">
+                <div class="profile-info">
+                  <img
+                    src="{{ url_for('static', filename='images/profile.png') }}"
+                    class="profile-avatar-lg"
+                  />
+                  <div>
+                    <strong>{{ session['teacher_name'] }}</strong>
+                    <p>{{ session['teacher_email'] }}</p>
+                    <small>Username: {{ session['teacher_username'] }}</small>
+                  </div>
+                </div>
+                <hr />
+                <a href="#" class="profile-link">👤 View Profile</a>
+                <a href="#" class="profile-link">🔑 Change Password</a>
+                <a href="/" class="profile-link logout">🚪 Logout</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= DASHBOARD CONTENT ================= -->
+        <div class="dashboard-container">
+          <!-- CLASS FILTER -->
+          <form method="get" class="class-filter">
+            <label><strong>Class:</strong></label>
+
+            <select name="class" required>
+              <option value="">Select Class</option>
+              {% for c in classes %}
+              <option
+                value="{{ c }}"
+                {% if c == selected_class %}selected{% endif %}
+              >
+                {{ c }}
+              </option>
+              {% endfor %}
+            </select>
+
+            <button type="submit" class="action-btn action-info">Apply</button>
+          </form>
+
+          {% if selected_class %}
+          <div class="badge">
+            Showing attendance for <b>{{ selected_class }}</b>
+          </div>
+          {% else %}
+          <div class="badge warning">
+            Please select a class to view attendance
+          </div>
+          {% endif %}
+
+          <!-- STAT CARDS -->
+          <div class="dashboard-cards">
+            <div class="card">
+              <h3>Present</h3>
+              <p>{{ present }}</p>
+            </div>
+            <div class="card">
+              <h3>Absent</h3>
+              <p>{{ absent }}</p>
+            </div>
+            <div class="card">
+              <h3>Late</h3>
+              <p>{{ late }}</p>
+            </div>
+            <div class="card">
+              <h3>Attendance Rate</h3>
+              <p>{{ rate }}%</p>
+            </div>
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="teacher-actions">
+            <a href="/teacher/timetable" class="action-btn">Timetable </a>
+
+            <a href="/teacher/history" class="action-btn">
+              Attendance History
+            </a>
+
+            <a href="/teacher/students" class="action-btn"> View Students </a>
+
+            <a href="/teacher/low-attendance" class="action-btn action-danger">
+              Low Attendance
+            </a>
+
+            <a href="/teacher/class-report" class="action-btn action-success">
+              Class Report
+            </a>
+
+            <a href="/teacher/subject-report" class="action-btn action-purple">
+              Subject Report
+            </a>
+
+            <a
+              href="/teacher/students-performance"
+              class="action-btn action-info"
+            >
+              Performance
+            </a>
+          </div>
+
+          <!-- CHARTS -->
+          <div class="attendance-table">
+            <h3>Attendance Analytics</h3>
+
+            <div class="charts-grid">
+              <div class="chart-card">
+                <h4>Attendance Distribution</h4>
+                <div class="chart-box">
+                  <canvas id="attendancePie"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <h4>Attendance Trend</h4>
+                <div class="chart-box">
+                  <canvas id="attendanceBar"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ================= SCRIPTS ================= -->
+
+    <script>
+      /* SIDEBAR TOGGLE */
+      const layout = document.querySelector(".app-layout");
+      const toggleBtn = document.querySelector(".sidebar-toggle");
+
+      toggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        layout.classList.toggle("sidebar-collapsed");
+      });
+
+      document.addEventListener("click", (e) => {
+        if (
+          !e.target.closest(".sidebar") &&
+          !e.target.closest(".sidebar-toggle")
+        ) {
+          layout.classList.add("sidebar-collapsed");
+        }
+      });
+    </script>
+
+    <script>
+      /* PROFILE DROPDOWN */
+      const profileTrigger = document.querySelector(".profile-trigger");
+      const profileDropdown = document.querySelector(".profile-dropdown");
+
+      profileTrigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        profileDropdown.classList.toggle("show");
+      });
+
+      document.addEventListener("click", () => {
+        profileDropdown.classList.remove("show");
+      });
+    </script>
+
+    <script>
+      /* PIE CHART */
+      new Chart(document.getElementById('attendancePie'), {
+          type: 'doughnut',
+          data: {
+              labels: ['Present', 'Absent', 'Late'],
+              datasets: [{
+                  data: [{{ present }}, {{ absent }}, {{ late }}],
+                  backgroundColor: ['#22c55e', '#ef4444', '#facc15']
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              cutout: '65%',
+              plugins: { legend: { position: 'bottom' } }
+          }
+      });
+    </script>
+    <script>
+      new Chart(document.getElementById('attendanceBar'), {
+          type: 'bar',
+          data: {
+              labels: {{ trend_dates | tojson }},
+              datasets: [{
+                  label: 'Present Students',
+                  data: {{ trend_counts | tojson }},
+                  backgroundColor: '#2563eb',   // 🔵 cleaner blue
+                  borderRadius: 6,
+                  barThickness: 30,             // ✅ makes bar SMALL
+                  maxBarThickness: 40
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                  legend: {
+                      display: true
+                  }
+              },
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      ticks: {
+                          stepSize: 5
+                      }
+                  },
+                  x: {
+                      grid: {
+                          display: false
+                      }
+                  }
+              }
+          }
+      });
+    </script>
+  </body>
+</html>

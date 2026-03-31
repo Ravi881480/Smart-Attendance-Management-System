@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Admin Panel{% endblock %}</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="app-layout">
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="sidebar">
+        <h3>Admin Menu</h3>
+
+        <nav class="sidebar-menu">
+          <a href="/admin-dashboard">📊 Dashboard</a>
+          <a href="/admin/students">👨‍🎓 Students</a>
+          <a href="/admin/teachers">👩‍🏫 Teachers</a>
+
+          <!-- ✅ THIS IS WHAT YOU NEED -->
+          <a href="/admin/teacher-timetable"> 📅 Teacher Timetable </a>
+
+          <a href="/logout" class="logout">🚪 Logout</a>
+        </nav>
+      </aside>
+
+      <!-- ============ MAIN CONTENT ============ -->
+      <main class="main-content">{% block content %} {% endblock %}</main>
+    </div>
+  </body>
+</html>

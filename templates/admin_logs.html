@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Activity Logs</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="app-layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          <h3>Admin Menu</h3>
+        </div>
+
+        <nav class="sidebar-menu">
+          <a href="/admin-dashboard">📊 Dashboard</a>
+          <a href="/admin/profile">👤 Admin Profile</a>
+          <a href="/admin/logs" class="active">📜 Activity Logs</a>
+          <a href="/logout" class="logout">🚪 Logout</a>
+        </nav>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content">
+        <div class="card">
+          <h2 class="card-title">📜 Admin Activity Logs</h2>
+
+          {% if logs %}
+          <table class="logs-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Admin</th>
+                <th>Action</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in logs %}
+              <tr>
+                <td>#{{ log.id }}</td>
+                <td>
+                  <span class="badge admin">{{ log.admin_username }}</span>
+                </td>
+                <td>
+                  <span class="badge action">{{ log.action }}</span>
+                </td>
+                <td>{{ log.timestamp }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p class="empty-state">No activity logs found.</p>
+          {% endif %}
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

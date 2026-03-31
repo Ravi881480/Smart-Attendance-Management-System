@@ -1,0 +1,36 @@
+<h2>Edit Timetable</h2>
+
+<form method="post">
+  <label>Day</label>
+  <input type="text" name="day" value="{{ timetable.day }}" required />
+
+  <label>Subject</label>
+  <input type="text" name="subject" value="{{ timetable.subject }}" required />
+
+  <label>Class</label>
+  <input type="text" name="class" value="{{ timetable.class }}" required />
+
+  <label>Start Time</label>
+  <input
+    type="time"
+    name="start_time"
+    value="{{ timetable.start_time }}"
+    required
+  />
+
+  <label>End Time</label>
+  <input
+    type="time"
+    name="end_time"
+    value="{{ timetable.end_time }}"
+    required
+  />
+
+  <button type="submit" class="action-btn action-success">
+    Update Timetable
+  </button>
+
+  <a href="/admin/teacher-timetable" class="action-btn action-danger">
+    Cancel
+  </a>
+</form>

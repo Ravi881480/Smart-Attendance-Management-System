@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Add Teacher</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="login-page">
+      <div class="login-container">
+        <div class="login-card">
+          <h2>Add Teacher</h2>
+          <p class="subtitle">Admin Panel</p>
+
+          <form method="POST">
+            <input type="text" name="name" placeholder="Full Name" required />
+            <input type="email" name="email" placeholder="Email" required />
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              required
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+
+            <button class="login-btn">Add Teacher</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Timetable</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="app-layout student-layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="sidebar-top">
+    <h3>Student Menu</h3>
+
+    <nav class="sidebar-menu">
+        <a href="/student-dashboard/{{ uid }}">
+            🏠 <span>Dashboard</span>
+        </a>
+
+        <a href="/attendance/{{ uid }}">
+            📊 <span>Attendance</span>
+        </a>
+
+        <a href="/timetable/{{ uid }}" class="active">
+            🗓 <span>Time Table</span>
+        </a>
+
+        <a href="/reports/{{ uid }}">
+            📄 <span>Reports</span>
+        </a>
+    </nav>
+</div>
+
+
+        <div class="sidebar-bottom">
+    <nav class="sidebar-menu">
+        <a href="/" class="logout">
+            🚪 <span>Logout</span>
+        </a>
+    </nav>
+</div>
+
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content">
+
+        <!-- ================= HEADER ================= -->
+        <div class="dashboard-header student-header">
+            <div class="header-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+                <h2>Timetable</h2>
+            </div>
+
+            <div class="header-right">
+                <span>UID: {{ uid }}</span>
+                <img src="{{ url_for('static', filename='images/profile.png') }}"
+                     class="profile-avatar">
+            </div>
+        </div>
+
+        <!-- ================= CONTENT ================= -->
+        <div class="dashboard-container attendance-table">
+
+            <h3 style="margin-bottom:15px;">Weekly Timetable</h3>
+
+            <table>
+                <tr>
+                    <th>Day</th>
+                    <th>Subject</th>
+                    <th>Time</th>
+                </tr>
+
+                {% for row in timetable %}
+                <tr>
+                    <td>{{ row.day }}</td>
+                    <td>{{ row.subject }}</td>
+                    <td>{{ row.time }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+
+        </div>
+
+    </main>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+function toggleSidebar() {
+    document.querySelector(".app-layout")
+        .classList.toggle("sidebar-collapsed");
+}
+</script>
+
+</body>
+</html>

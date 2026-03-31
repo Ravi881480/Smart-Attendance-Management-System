@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Login</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body class="login-page">
+    <!-- Dark overlay (handled by CSS ::before) -->
+
+    <div class="login-container">
+      <div class="login-card">
+        <h2>Admin Login</h2>
+        <p class="subtitle">Attendance Management System</p>
+
+        {% if error %}
+        <p style="color: #ff4d4d; font-size: 14px; margin-bottom: 10px">
+          {{ error }}
+        </p>
+        {% endif %}
+
+        <form method="POST">
+          <input
+            type="text"
+            name="username"
+            placeholder="Admin Username"
+            required
+          />
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Admin Password"
+            required
+          />
+
+          <button type="submit" class="login-btn">LOGIN</button>
+        </form>
+
+        <div class="footer-text">© 2026 Smart Attendance Management System</div>
+      </div>
+    </div>
+  </body>
+</html>

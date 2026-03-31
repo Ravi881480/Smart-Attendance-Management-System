@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>View Teachers</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="page-header">
+      <h2>Teachers List</h2>
+      <a href="/admin-dashboard" class="back-btn">⬅ Back</a>
+    </div>
+
+    <div class="page-container">
+      <div class="attendance-table">
+        <table>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Action</th>
+          </tr>
+
+          {% for t in teachers %}
+          <tr>
+            <td>{{ t.id }}</td>
+            <td>{{ t.name }}</td>
+            <td>{{ t.email }}</td>
+            <td>{{ t.username }}</td>
+            <td>
+              <a
+                href="/admin/delete-teacher/{{ t.id }}"
+                onclick="return confirm('Delete this teacher?');"
+                style="color: red; font-weight: 600"
+              >
+                Delete
+              </a>
+            </td>
+          </tr>
+          {% endfor %} {% if teachers|length == 0 %}
+          <tr>
+            <td colspan="5">No teachers found</td>
+          </tr>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Student Dashboard</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      /* Floating AI Chat Styles */
+      .ai-chat-widget {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 350px;
+        max-height: 500px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1000;
+        border: 1px solid #e5e7eb;
+      }
+      .chat-header {
+        background: #4f46e5;
+        color: white;
+        padding: 12px 16px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #chatBox {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background: #f9fafb;
+        height: 300px;
+        font-size: 14px;
+      }
+      .chat-input-area {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #e5e7eb;
+        background: white;
+      }
+      #userInput {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        outline: none;
+      }
+      .send-btn {
+        background: #4f46e5;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        margin-left: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .message {
+        margin-bottom: 10px;
+      }
+      .user-msg {
+        color: #4f46e5;
+        font-weight: 600;
+      }
+      .ai-msg {
+        color: #374151;
+        background: #f3f4f6;
+        padding: 8px;
+        border-radius: 8px;
+      }
+      .chat-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background: #4f46e5;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 22px;
+        z-index: 1000;
+      }
+
+      .ai-chat-widget {
+        display: none;
+      }
+
+      .ai-chat-widget.show {
+        display: flex;
+        bottom: 80px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app-layout">
+      <!-- ✅ SAME AS TEACHER -->
+
+      <!-- ================= SIDEBAR ================= -->
+
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          <h3>Student Menu</h3>
+        </div>
+
+        <nav class="sidebar-menu">
+          <a href="/student-dashboard/{{ student.uid }}">
+            🏠 <span>Dashboard</span>
+          </a>
+
+          <a href="/attendance/{{ student.uid }}">
+            📊 <span>Attendance</span>
+          </a>
+
+          <a href="/timetable/{{ student.uid }}" class="active">
+            🗓 <span>Time Table</span>
+          </a>
+
+          <a href="/reports/{{ student.uid }}"> 📄 <span>Reports</span> </a>
+
+          <!-- 🔴 LOGOUT MUST BE INSIDE sidebar-menu -->
+          <a href="/" class="logout"> 🚪 <span>Logout</span> </a>
+        </nav>
+      </aside>
+
+      <!-- ================= MAIN CONTENT ================= -->
+      <main class="main-content">
+        <!-- ================= HEADER ================= -->
+        <div class="dashboard-header">
+          <div class="header-left">
+            <button class="sidebar-toggle">☰</button>
+            <h2>Student Dashboard</h2>
+          </div>
+
+          <div class="header-right">
+            <div class="profile-menu">
+              <div class="profile-trigger" id="profileBtn">
+                <img
+                  src="{{ url_for('static', filename='images/profile.png') }}"
+                  class="profile-avatar"
+                />
+                <span class="profile-name">{{ student.name }}</span>
+                <span class="profile-arrow">▼</span>
+              </div>
+
+              <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-info">
+                  <img
+                    src="{{ url_for('static', filename='images/profile.png') }}"
+                    class="profile-avatar-lg"
+                  />
+                  <div>
+                    <strong>{{ student.name }}</strong>
+                    <p>{{ student.email }}</p>
+                    <small>UID: {{ student.uid }}</small>
+                  </div>
+                </div>
+
+                <hr />
+
+                <p><strong>Attendance:</strong> {{ overall_percentage }}%</p>
+                <p>
+                  <strong>Status:</strong>
+                  <span class="{{ status_class }}"
+                    >{{ eligibility_status }}</span
+                  >
+                </p>
+
+                <hr />
+                <a href="/" class="profile-link logout">🚪 Logout</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= CONTENT ================= -->
+        <div class="dashboard-container">
+          <!-- SUMMARY CARDS -->
+          <div class="dashboard-cards">
+            <div class="card">
+              <h3>Subjects</h3>
+              <p>{{ attendance | length }}</p>
+            </div>
+
+            <div class="card">
+              <h3>Total Attended</h3>
+              <p>{{ total_attended }}</p>
+            </div>
+
+            <div class="card">
+              <h3>Overall %</h3>
+              <p>{{ overall_percentage }}%</p>
+            </div>
+
+            <div class="card">
+              <h3>Eligibility</h3>
+              <p class="{{ status_class }}">{{ eligibility_status }}</p>
+            </div>
+          </div>
+
+          <!-- PROGRESS BAR -->
+          <div class="attendance-table">
+            <h3>Overall Attendance Progress</h3>
+
+            <div
+              style="
+                background: #e5e7eb;
+                border-radius: 10px;
+                height: 18px;
+                overflow: hidden;
+              "
+            >
+              <div
+                style="
+                        width: {{ overall_percentage }}%;
+                        height: 100%;
+                        background: {% if overall_percentage >= 75 %}#22c55e{% elif overall_percentage >= 65 %}#facc15{% else %}#ef4444{% endif %};
+                        transition: width 0.8s ease;"
+              ></div>
+            </div>
+
+            <p style="margin-top: 10px; font-weight: 600">
+              {{ overall_percentage }}% attendance
+            </p>
+          </div>
+
+          <!-- SUBJECT TABLE -->
+          <div class="attendance-table">
+            <h3>Subject-wise Attendance</h3>
+
+            <table>
+              <tr>
+                <th>Subject</th>
+                <th>Total</th>
+                <th>Attended</th>
+                <th>%</th>
+              </tr>
+
+              {% for row in attendance %}
+              <tr>
+                <td>{{ row.subject }}</td>
+                <td>{{ row.total_classes }}</td>
+                <td>{{ row.attended_classes }}</td>
+                <td>
+                  {{ ((row.attended_classes / row.total_classes) * 100) |
+                  round(1) }}%
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+
+          <!-- PIE CHART -->
+          <div class="attendance-chart">
+            <h3>Attendance Distribution</h3>
+            <div class="chart-box">
+              <canvas id="attendancePie"></canvas>
+            </div>
+          </div>
+
+          <!-- DOWNLOAD -->
+          <div style="text-align: center; margin-top: 25px">
+            <a href="/download-report/{{ student.uid }}">
+              <button class="login-btn" style="width: auto; padding: 12px 28px">
+                Download Attendance Report
+              </button>
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      /* PIE CHART */
+      const attendanceData = {{ attendance | tojson | safe }};
+      new Chart(document.getElementById('attendancePie'), {
+          type: 'doughnut',
+          data: {
+              labels: attendanceData.map(r => r.subject),
+              datasets: [{
+                  data: attendanceData.map(r => (r.attended_classes / r.total_classes) * 100),
+                  backgroundColor: [
+                      '#42A5F5','#66BB6A','#FFA726',
+                      '#AB47BC','#26C6DA','#FF7043'
+                  ]
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { position: 'bottom' } }
+          }
+      });
+    </script>
+
+    <script>
+      const layout = document.querySelector(".app-layout");
+      const toggleBtn = document.querySelector(".sidebar-toggle");
+
+      toggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // ⛔ prevent bubbling
+        layout.classList.toggle("sidebar-collapsed");
+      });
+
+      /* OPTIONAL: close sidebar when clicking outside (desktop UX) */
+      document.addEventListener("click", (e) => {
+        if (
+          !e.target.closest(".sidebar") &&
+          !e.target.closest(".sidebar-toggle")
+        ) {
+          layout.classList.add("sidebar-collapsed");
+        }
+      });
+    </script>
+
+    <script>
+      /* ================= PROFILE DROPDOWN ================= */
+      const profileTrigger = document.querySelector(".profile-trigger");
+      const profileDropdown = document.querySelector(".profile-dropdown");
+
+      if (profileTrigger && profileDropdown) {
+        profileTrigger.addEventListener("click", (e) => {
+          e.stopPropagation();
+          profileDropdown.classList.toggle("show");
+        });
+
+        document.addEventListener("click", () => {
+          profileDropdown.classList.remove("show");
+        });
+      }
+    </script>
+    <script>
+      async function sendMessage() {
+        const input = document.getElementById("userInput");
+        const chatBox = document.getElementById("chatBox");
+
+        if (!input || !chatBox) return;
+
+        const message = input.value.trim();
+        if (message === "") return;
+
+        chatBox.innerHTML += `
+    <div class="message">
+      <span class="user-msg">You:</span> ${message}
+    </div>
+  `;
+        input.value = "";
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+          const res = await fetch("/ai-chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message,
+              uid: "{{ student.uid }}",
+            }),
+          });
+          const data = await res.json();
+          chatBox.innerHTML += `
+      <div class="message ai-msg"><b>AI:</b> ${data.reply}</div>
+    `;
+        } catch {
+          chatBox.innerHTML += `
+      <div class="message ai-msg" style="color:red;">AI error</div>
+    `;
+        }
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const input = document.getElementById("userInput");
+        if (input) {
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") sendMessage();
+          });
+        }
+      });
+
+      function toggleChat() {
+        document.querySelector(".ai-chat-widget").classList.toggle("show");
+      }
+    </script>
+
+    <div class="chat-toggle" onclick="toggleChat()">🤖</div>
+
+    <!-- ================= AI CHAT WIDGET ================= -->
+    <div class="ai-chat-widget">
+      <div class="chat-header">
+        <span>🤖 Student AI Assistant</span>
+        <button
+          onclick="toggleChat()"
+          style="background: none; border: none; color: white; cursor: pointer"
+        >
+          ✖
+        </button>
+      </div>
+
+      <div id="chatBox">
+        <div class="message ai-msg">
+          Hi {{ student.name }} 👋<br />
+          Ask me about attendance, reports, or help.
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="Type your message..." />
+        <button class="send-btn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </body>
+</html>

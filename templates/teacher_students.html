@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Students</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    body {
+      background: #f4f6fb;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    .page-header {
+      max-width: 1100px;
+      margin: 30px auto 15px;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      padding: 18px 24px;
+      border-radius: 14px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .page-header h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .back-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 30px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    }
+
+    .filter-box {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    select, button {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #e0e7ff;
+      color: #1e3a8a;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th {
+      background: #2563eb;
+      color: white;
+      padding: 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 14px;
+      color: #111827;
+      font-weight: 500;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+
+    .empty {
+      text-align: center;
+      color: #6b7280;
+      font-size: 15px;
+      padding: 40px 0;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <h2>👨‍🎓 View Students</h2>
+    <a href="/teacher-dashboard">
+      <button class="back-btn">← Back</button>
+    </a>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="container">
+
+    <!-- FILTER -->
+    <form method="get" action="/teacher/students" class="class-filter">
+  <select name="class" required>
+    <option value="">Select Class</option>
+    {% for c in classes %}
+      <option value="{{ c }}" {% if c == selected_class %}selected{% endif %}>
+        {{ c }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <button type="submit" class="action-btn action-info">View</button>
+</form>
+
+
+    {% if selected_class and selected_section %}
+      <div class="badge">
+        Class {{ selected_class }} – Section {{ selected_section }}
+      </div>
+    {% endif %}
+
+    {% if students %}
+      <table>
+        <tr>
+          <th>UID</th>
+          <th>Name</th>
+          <th>Email</th>
+        </tr>
+
+        {% for s in students %}
+        <tr>
+          <td>{{ s.uid }}</td>
+          <td>{{ s.name }}</td>
+          <td>{{ s.email }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <div class="empty">
+        📌 Select a class and section to view students
+      </div>
+    {% endif %}
+
+  </div>
+
+</body>
+</html>

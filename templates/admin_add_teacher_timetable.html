@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Add Teacher Timetable</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+
+    <style>
+      /* ===== GLOBAL BACKGROUND ===== */
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(
+          135deg,
+          #e0e7ff 0%,
+          #f8fafc 45%,
+          #eef2ff 100%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Segoe UI", system-ui, sans-serif;
+      }
+
+      /* ===== CARD ===== */
+      .timetable-card {
+        width: 100%;
+        max-width: 720px;
+        padding: 36px;
+        border-radius: 18px;
+
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+
+        box-shadow:
+          0 30px 60px rgba(0, 0, 0, 0.15),
+          inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      }
+
+      .timetable-card h2 {
+        margin-bottom: 28px;
+        text-align: center;
+        font-weight: 700;
+        color: #1e293b;
+      }
+
+      /* ===== FORM GRID ===== */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #334155;
+      }
+
+      .form-group input,
+      .form-group select {
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid #c7d2fe;
+        font-size: 15px;
+        background: #f8fafc;
+        transition: 0.2s ease;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        background: #ffffff;
+      }
+
+      /* ===== ACTIONS ===== */
+      .form-actions {
+        margin-top: 34px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #2563eb, #4f46e5);
+        color: #fff;
+        padding: 12px 26px;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
+      }
+
+      .btn-link {
+        text-decoration: none;
+        color: #2563eb;
+        font-weight: 600;
+      }
+
+      .btn-link:hover {
+        text-decoration: underline;
+      }
+
+      /* ===== MOBILE ===== */
+      @media (max-width: 640px) {
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="timetable-card">
+      <h2>➕ Add Teacher Timetable</h2>
+
+      <form method="POST">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Teacher</label>
+            <select name="teacher_username" required>
+              {% for t in teachers %}
+              <option value="{{ t.username }}">
+                {{ t.name }} ({{ t.username }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Day</label>
+            <select name="day">
+              <option>Monday</option>
+              <option>Tuesday</option>
+              <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+              <option>Saturday</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Subject</label>
+            <input type="text" name="subject" placeholder="e.g. COA" required />
+          </div>
+
+          <div class="form-group">
+            <label>Class</label>
+            <select name="class" required>
+              <option value="">Select Class</option>
+              <option value="715-A">715-A</option>
+              <option value="716-B">716-B</option>
+              <option value="717-A">717-A</option>
+              <option value="718-B">718-B</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Start Time</label>
+            <input type="time" name="start_time" required />
+          </div>
+
+          <div class="form-group">
+            <label>End Time</label>
+            <input type="time" name="end_time" required />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <a href="/admin/teacher-timetable" class="btn-link">
+            ⬅ Back to Timetable
+          </a>
+
+          <button type="submit" class="btn-primary">Add Timetable</button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

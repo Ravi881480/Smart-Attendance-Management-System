@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Smart Attendance Management System</title>
+
+    <!-- Main CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+
+  <body class="login-page">
+    <!-- Background Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Main Content -->
+    <div class="container">
+      <header class="header">
+        <h1>Smart Attendance Management System</h1>
+        <p></p>
+      </header>
+
+      <!-- ================= LOGIN SECTION ================= -->
+      <section class="login-section">
+        <!-- Student Login -->
+        <div class="login-card">
+          <div class="icon">
+            <i class="fa-solid fa-user-graduate"></i>
+          </div>
+          <h2>Student Login</h2>
+          <p>Login using UID and password to view attendance.</p>
+
+          <a href="/student-login">
+            <button class="btn">Login Now</button>
+          </a>
+        </div>
+
+        <!-- Teacher Login -->
+        <div class="login-card">
+          <div class="icon">
+            <i class="fa-solid fa-chalkboard-user"></i>
+          </div>
+          <h2>Teacher Login</h2>
+          <p>Manage attendance and student records.</p>
+
+          <a href="/teacher-login">
+            <button class="btn">Login Now</button>
+          </a>
+        </div>
+        <!-- Admin Login -->
+        <div class="login-card">
+          <div class="icon">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <h2>Admin Login</h2>
+          <p>System administration and full control.</p>
+
+          <a href="/admin-login">
+            <button class="btn">Login Now</button>
+          </a>
+        </div>
+      </section>
+
+      <footer class="footer">© 2026 Smart Attendance Management System</footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Low Attendance Students</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="dashboard-header">
+    <h2>Low Attendance Students</h2>
+    <a href="/teacher-dashboard"><button class="logout-btn">Back</button></a>
+</div>
+
+<div class="dashboard-container">
+<div class="attendance-table">
+<table>
+<tr>
+    <th>UID</th>
+    <th>Name</th>
+    <th>Attendance %</th>
+</tr>
+{% for s in students %}
+<tr>
+    <td>{{ s.uid }}</td>
+    <td>{{ s.name }}</td>
+    <td style="color:red;font-weight:bold;">{{ s.percentage }}%</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Manage Students</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="dashboard-container">
+      <div class="dashboard-header">
+        <h2>Manage Students</h2>
+        <a href="/admin-dashboard" class="logout-btn">Back</a>
+      </div>
+
+      <div class="attendance-table">
+        <table>
+          <tr>
+            <th>UID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Action</th>
+          </tr>
+
+          {% for s in students %}
+          <tr>
+            <td>{{ s.uid }}</td>
+            <td>{{ s.name }}</td>
+            <td>{{ s.email }}</td>
+            <td>
+              <a href="{{ url_for('admin_edit_student', uid=s.uid) }}">Edit</a>
+              |
+              <a
+                href="{{ url_for('admin_delete_student', uid=s.uid) }}"
+                onclick="return confirm('Delete this student?');"
+                style="color: red"
+              >
+                Delete
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
