@@ -1365,3 +1365,57 @@ select option {
 .logs-table tbody tr {
     transition: 0.2s ease;
 }
+
+/* ================= EDIT ATTENDANCE ================= */
+
+.edit-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+.edit-card {
+    background: white;
+    padding: 30px;
+    width: 350px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+.edit-card h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.edit-card p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.edit-card select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+.update-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.update-btn:hover {
+    background: linear-gradient(135deg, #0056b3, #003f80);
+}

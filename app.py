@@ -599,6 +599,51 @@ def attendance_history():
 
     return render_template('attendance_history.html', records=records)
 
+@app.route('/teacher/edit-attendance/<int:id>', methods=['GET', 'POST'])
+def edit_attendance(id):
+
+    if not session.get('teacher_logged_in'):
+        return redirect(url_for('teacher_login'))
+
+    conn = get_db_connection()
+
+    record = conn.execute(
+        "SELECT * FROM daily_attendance WHERE id=?",
+        (id,)
+    ).fetchone()
+
+    if not record:
+        conn.close()
+        return "Record not found"
+
+    #  DATE RESTRICTION (3 days)
+    record_date = datetime.strptime(record['date'], "%Y-%m-%d")
+    today = datetime.today()
+
+    diff = (today - record_date).days
+
+    if diff > 3:
+        conn.close()
+        return "❌ You can only edit attendance within 3 days"
+
+    # ================= UPDATE =================
+    if request.method == 'POST':
+        new_status = request.form['status']
+
+        conn.execute("""
+            UPDATE daily_attendance
+            SET status=?
+            WHERE id=?
+        """, (new_status, id))
+
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for('attendance_history'))
+
+    conn.close()
+    return render_template('edit_attendance.html', record=record)
+
 # ================= VIEW ALL STUDENTS =====================
 @app.route('/teacher/students')
 def teacher_students():
@@ -1045,7 +1090,18 @@ def ai_chat():
     if not uid:
         return jsonify({"reply": "Student not identified."})
 
-    conn = get_db_connection()   # ✅ ADD THIS
+    # ================= REGEX PATTERNS (ONLY ONCE ✅) =================
+    attendance_pattern = r"(attendance|percentage|percent|my attendance|overall)"
+    total_attended_pattern = r"(total.*(attend|present)|how many present)"
+    total_classes_pattern = r"(total classes|how many classes|classes)"
+    eligibility_pattern = r"(eligible|eligibility|can i sit)"
+    highest_pattern = r"(highest|best|maximum|top)"
+    weakest_pattern = r"(lowest|weak|minimum|poor)"
+    future_miss_pattern = r"(miss|skip|bunk).*(\d+)"
+    future_attend_pattern = r"(attend).*(\d+)"
+    subject_pattern = r"(maths|mathematics|java|os|operating system|software engineering|se|data analytics|dsa)"
+
+    conn = get_db_connection()
 
     rows = conn.execute("""
         SELECT
@@ -1057,7 +1113,7 @@ def ai_chat():
         GROUP BY subject
     """, (uid,)).fetchall()
 
-    conn.close()  # ✅ ADD THIS
+    conn.close()
 
     if not rows:
         return jsonify({"reply": "No attendance data found."})
@@ -1070,22 +1126,11 @@ def ai_chat():
     overall = round((total_attended / total_classes) * 100, 2) if total_classes else 0
     eligible = "Eligible" if overall >= 75 else "Not Eligible"
 
-    # ================= REGEX PATTERNS =================
-    attendance_pattern = r"(attendance|percentage|percent|%)"
-    total_attended_pattern = r"(total|how many).*(attend|present)"
-    total_classes_pattern = r"(total classes|how many classes|classes in total)"
-    eligibility_pattern = r"(eligible|eligibility|exam)"
-    highest_pattern = r"(highest|best|maximum|top)"
-    weakest_pattern = r"(lowest|weak|minimum|poor)"
-    future_miss_pattern = r"(miss|skip|bunk).*(\d+)"
-    future_attend_pattern = r"(attend).*(\d+)"
-    subject_pattern = r"(maths|mathematics|java|os|operating system|software engineering|se|data analytics|dsa)"
-
     # ================= FORMULA =================
     if "formula" in user_message or "calculate" in user_message:
-        return jsonify({"reply": "(attended classes / total classes) × 100"})
+        return jsonify({"reply": "(attended / total) × 100"})
 
-    # ================= SUBJECT-WISE FUTURE =================
+    # ================= SUBJECT FUTURE =================
     subject_match = re.search(subject_pattern, user_message)
     number_match = re.search(r"(\d+)", user_message)
 
@@ -1112,35 +1157,42 @@ def ai_chat():
         total = s["total_classes"]
         attended = s["attended_classes"]
 
-        if "miss" in user_message or "bunk" in user_message or "skip" in user_message:
+        if "miss" in user_message or "bunk" in user_message:
             new_percent = round((attended / (total + count)) * 100, 2)
         else:
             new_percent = round(((attended + count) / (total + count)) * 100, 2)
 
         status = "Eligible" if new_percent >= 75 else "Not Eligible"
 
-        return jsonify({
-            "reply": f"{subject} attendance will be {new_percent}% → {status}"
-        })
+        return jsonify({"reply": f"{subject}: {new_percent}% → {status}"})
 
     # ================= OVERALL FUTURE =================
     miss_match = re.search(future_miss_pattern, user_message)
     if miss_match:
         n = int(miss_match.group(2))
         new_percent = round((total_attended / (total_classes + n)) * 100, 2)
-        return jsonify({
-            "reply": f"After missing {n} classes: {new_percent}% → Not Eligible"
-        })
+        return jsonify({"reply": f"After missing {n}: {new_percent}% → Not Eligible"})
 
     attend_match = re.search(future_attend_pattern, user_message)
     if attend_match:
         n = int(attend_match.group(2))
         new_percent = round(((total_attended + n) / (total_classes + n)) * 100, 2)
+        return jsonify({"reply": f"After attending {n}: {new_percent}% → Eligible"})
+    # ================= SMART QUESTIONS (MOVE UP 🔥) =================
+    if "java" in user_message:
+        s = next((x for x in attendance if x["subject"].lower() == "java"), None)
+    if s:
+        percent = round((s["attended_classes"] / s["total_classes"]) * 100, 2)
         return jsonify({
-            "reply": f"After attending {n} classes: {new_percent}% → Eligible"
+            "reply": f"Your Java attendance is {percent}%"
         })
 
-    # ================= BASIC QUERIES =================
+    if "my attendance" in user_message:
+        return jsonify({
+        "reply": f"Your overall attendance is {overall}% → {eligible}"
+    })
+
+    # ================= BASIC =================
     if match(total_classes_pattern, user_message):
         return jsonify({"reply": f"Total classes: {total_classes}"})
 
@@ -1148,38 +1200,27 @@ def ai_chat():
         return jsonify({"reply": f"Total attended: {total_attended}"})
 
     if match(eligibility_pattern, user_message):
-        return jsonify({"reply": f"Eligibility: {eligible} (75% required)"})
+        return jsonify({"reply": f"Eligibility: {eligible}"})
 
     if match(highest_pattern, user_message):
         s = max(attendance, key=lambda x: x["attended_classes"] / x["total_classes"])
         percent = round((s["attended_classes"] / s["total_classes"]) * 100, 2)
-        return jsonify({
-            "reply": f"Highest attendance subject is {s['subject']} with {percent}%"
-        })
+        return jsonify({"reply": f"Highest: {s['subject']} ({percent}%)"})
 
     if match(weakest_pattern, user_message):
         s = min(attendance, key=lambda x: x["attended_classes"] / x["total_classes"])
         percent = round((s["attended_classes"] / s["total_classes"]) * 100, 2)
-        return jsonify({
-            "reply": f"Weakest subject is {s['subject']} with {percent}%"
-        })
+        return jsonify({"reply": f"Weakest: {s['subject']} ({percent}%)"})
 
     if match(attendance_pattern, user_message):
-        return jsonify({
-            "reply": f"Overall attendance: {overall}% → {eligible}"
-        })
+        return jsonify({"reply": f"Overall: {overall}% → {eligible}"})
 
-    if "focus" in user_message or "improve" in user_message:
+    if "improve" in user_message or "focus" in user_message:
         weak = min(attendance, key=lambda x: x["attended_classes"] / x["total_classes"])
         percent = round((weak["attended_classes"] / weak["total_classes"]) * 100, 2)
         return jsonify({
-            "reply": (
-                f"You should focus more on {weak['subject']}.\n"
-                f"Current attendance: {percent}%.\n"
-                f"Attending upcoming classes will help you reach eligibility."
-            )
+            "reply": f"Focus on {weak['subject']} ({percent}%). Attend more classes."
         })
-
     # ================= GEMINI FALLBACK =================
     try:
         response = client.models.generate_content(
@@ -1187,7 +1228,9 @@ def ai_chat():
             contents=user_message
         )
         return jsonify({"reply": response.text})
-    except:
+
+    except Exception as e:
+        print("AI ERROR:", e)
         return jsonify({"reply": "AI service unavailable"})
 
 

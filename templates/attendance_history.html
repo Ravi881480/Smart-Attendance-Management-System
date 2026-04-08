@@ -1,32 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-<title>Attendance History</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
+  <head>
+    <title>Attendance History</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
 
-<body>
-<div class="dashboard-header">
-<h2>Attendance History</h2>
-<a href="/teacher-dashboard"><button class="logout-btn">Back</button></a>
-</div>
+  <body>
+    <div class="dashboard-header">
+      <h2>Attendance History</h2>
+      <a href="/teacher-dashboard"><button class="logout-btn">Back</button></a>
+    </div>
 
-<div class="dashboard-container">
-<div class="attendance-table">
-<table>
-<tr>
-<th>Date</th><th>UID</th><th>Subject</th><th>Status</th>
-</tr>
-{% for r in records %}
-<tr>
-<td>{{ r.date }}</td>
-<td>{{ r.student_uid }}</td>
-<td>{{ r.subject }}</td>
-<td>{{ r.status }}</td>
-</tr>
-{% endfor %}
-</table>
-</div>
-</div>
-</body>
+    <div class="dashboard-container">
+      <div class="attendance-table">
+        <table>
+          <tr>
+            <th>Date</th>
+            <th>UID</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Action</th>
+            <!-- ✅ NEW -->
+          </tr>
+          {% for r in records %}
+          <tr>
+            <td>{{ r.date }}</td>
+            <td>{{ r.student_uid }}</td>
+            <td>{{ r.subject }}</td>
+            <td>{{ r.status }}</td>
+
+            <td>
+              <a href="/teacher/edit-attendance/{{ r.id }}">
+                <button>Edit</button>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </body>
 </html>
