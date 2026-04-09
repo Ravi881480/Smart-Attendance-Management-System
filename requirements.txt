@@ -1,0 +1,8 @@
+Flask
+Flask-Mail
+face-recognition
+google-genai
+numpy
+opencv-python
+python-dotenv
+reportlab

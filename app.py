@@ -7,9 +7,7 @@ from urllib import response
 import cv2
 import face_recognition
 import numpy as np
-import pytz
-from datetime import date
-from datetime import datetime
+from datetime import date, datetime, timedelta, timezone
 def match(pattern, text):
     return re.search(pattern, text)
 
@@ -20,16 +18,17 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from flask_mail import Mail, Message
 
-from google import genai
+try:
+    from google import genai
+except ImportError:
+    genai = None
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-print("GEMINI KEY:", GEMINI_API_KEY)
-
-# ✅ Correct for google-genai 1.61.0
-client = genai.Client(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY) if genai and GEMINI_API_KEY else None
 
 # ================= PATH =================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -1222,6 +1221,9 @@ def ai_chat():
             "reply": f"Focus on {weak['subject']} ({percent}%). Attend more classes."
         })
     # ================= GEMINI FALLBACK =================
+    if client is None:
+        return jsonify({"reply": "AI service unavailable"})
+
     try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
@@ -1237,13 +1239,14 @@ def ai_chat():
 
 @app.route("/gemini-test")
 def gemini_test():
+    if client is None:
+        return "Gemini client is not configured", 503
+
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents="Say hello in one sentence"
     )
     return response.text
-
-from datetime import datetime
 @app.route('/teacher/timetable')
 def teacher_timetable():
     if not session.get('teacher_logged_in'):
@@ -1399,12 +1402,12 @@ def admin_logs():
     """).fetchall()
     conn.close()
 
-    ist = pytz.timezone("Asia/Kolkata")
+    ist = timezone(timedelta(hours=5, minutes=30))
     logs = []
 
     for r in rows:
         utc_time = datetime.strptime(r["timestamp"], "%Y-%m-%d %H:%M:%S")
-        utc_time = utc_time.replace(tzinfo=pytz.utc)
+        utc_time = utc_time.replace(tzinfo=timezone.utc)
         ist_time = utc_time.astimezone(ist)
 
         logs.append({
